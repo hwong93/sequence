@@ -3,7 +3,7 @@ import {
   Dimensions,
   PanResponder,
 	View,
-	TouchableHighlight,
+	TouchableOpacity,
 	Text,
 	Alert
 } from 'react-native';
@@ -28,22 +28,30 @@ const styles = {
 export default class rotateView extends Component {
 	constructor(props) {
 		super(props);
-
+		this.state = {
+			count: 1,
+		}
 	}
 
   componentWillMount() {
-    this.panResponder = PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: this.handlePanResponderMove.bind(this)
+		this.panResponder = PanResponder.create({
+			onMoveShouldSetPanResponder: (evt, gestureState) => {
+				const {dx, dy} = gestureState;
+				return !((dx < 2 && dx > -2) && (dy > -2 && dy < 2))                  
+			},
+			onPanResponderTerminationRequest: (evt, gestureState) => true,
+			onPanResponderMove: this.handlePanResponderMove.bind(this),
     });
 	}
 	
-	alertUser(side) {
-		console.log('here');
+	_alertUser(side) {
+		this.setState({
+			count: this.state.count+1,
+		});
 	}
 
   handlePanResponderMove(e, gestureState) {
-    const {dx, dy} = gestureState;
+		const {dx, dy} = gestureState;
     const y = `${dx}deg`;
 		const x = `${-dy}deg`;
 		this.refView.setNativeProps({style: {transform: [{perspective: 1000}, {rotateX: x}, {rotateY: y}]}});
@@ -55,14 +63,13 @@ export default class rotateView extends Component {
         style={styles.container}
         {...this.panResponder.panHandlers}
       >
-				<TouchableHighlight
-					onPress={() => this.alertUser(1)}
+				<TouchableOpacity
+					onPress={() => this._alertUser()}
 					style={styles.rotateView}
 					ref={component => this.refView = component}
 				>
-	        <View
-					/>
-				</TouchableHighlight>
+	        <Text>{this.state.count}</Text>
+				</TouchableOpacity>
       </View>
     );
   }
