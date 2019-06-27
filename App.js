@@ -25,6 +25,10 @@ export default class App extends React.Component {
 		height,
 		scale: pixelRatio,
 	}) => {
+
+		this.raycater = new THREE.RayCaster();
+		this.mouse = new THREE.Vector2();
+
 		this.renderer = new ExpoTHREE.Renderer({ gl, pixelRatio, width, height});
 		// sets the clear color/basically the background ofthe app
 		this.renderer.setClearColor(0xffffff);
@@ -77,8 +81,20 @@ export default class App extends React.Component {
 	};
 
   onRender = delta => {
+		raycaster.setFromCamera(this.mouse, this.camera);
+		
+		let intersects = raycaster.intersectsObjects(this.cube);
+
     this.cube.rotation.x += 3.5 * delta;
     this.cube.rotation.y += 2 * delta;
     this.renderer.render(this.scene, this.camera);
-  };
+	};
+
+	onMouseDownEvent = (event) => {
+		event.preventDefault();
+		raycaster.setFromCamera(this.mouse, this.camera);
+		let intersects = raycaster.intersectsObjects(this.cube);
+			
+	}
+	
 }
